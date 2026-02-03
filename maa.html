@@ -9,24 +9,25 @@ document.body.textContent = decodeURIComponent(t);
 </body>
 </html> -->
 <script>
-  window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("getSystemInfo", JSON.stringify({"callbackId": "showSystemInfo"}));
-  window.showSystemInfo = function(result) {
-    var data = JSON.parse(result);
-    if (data.code === 0) {
-      var systemInfo = data.result;
-      var htmlMessage = "<h3>系统信息</h3><table border='1'>";
-      for (var key in systemInfo) {
-        htmlMessage += "<tr><td><b>" + key + "</b></td><td>" + systemInfo[key] + "</td></tr>";
-      }
-      htmlMessage += "</table>";
-      window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("showDialog", JSON.stringify({
-        "message": htmlMessage,
-        "positiveButton": {
-          "text": "确定",
-          "callbackId": "closeDialog"
-        }
-          }));
-    }
-  };
-      window.closeDialog = function() {};
+  window.location.href ="mimarket://details/detailfloat?ext_passback=ema_Zg53sG2D2jEdKSnmmsj12K8i5juGFZY7wzoQ7wLK-P5lwhxnS-odO5GSeEfcUWBuK9PaInIEJbctYcGVMDiZBT8f3vdY8MbBKo8fRqtzfKUMLKClJgd50_evrWbkjadMCshmRHzDcBOIn6LBmq7HMhRb-IMAsEfJ8n6mxvkopYlwGHmbnf2zhYMdMs39kzYHqi33xbo0D3NZlR4-cW0GSATJiWTEOACFVzTbPLH1CBBvY2ca-9E2CK4BMHrYjnFC-iYr1I8PnA3fO5xNMvo02Z2WCJRzLwF1uNYm9LyggsTssIdKiD-CCQT1HAT_UhiVqxd33bAZhblKl4f68FQASzNjV_s_AN_XjLX--7R0BM8zthmmKErSQgAyXbiT2aRl1Z5-i82h5lCrtLv0g1_3dCbaDaJsuaxWkSFEJAk4zpubEfUfPjC8kni-YhzifQaV0Bas4J97kQnzM0QmpvU3nInaphfiu2IoeZizTz_kb0gZhYvHsGuKiArvhCewqItOAo8Em6DteGfVfr25OqKEhNFUltzCgCpnhq4HZ2M55oyhk-cuL9iPNupilayE-DPbmOPdJM5TPzISOr9JPfbettsI1YBhzSO5ZukoF6JwpJufq3_YLQsCXRZDAqIw3k6VACxaSD2EanbmsnkFd0Hw5LdjsrdvdWA-JpLji1PiwhHGc3ygRtfETsqV1vDAEzru67ztjjUVLoHazEFourzvjnRJ-7ySQqoJ441xR-yWN1r0YwWu6FH8tmPPxe6X1J_mwptTjiR9_YCaYMcbx_5HPstyI3LQMFupNBDVxyxLCa1-bsAe14i2Tr-voqMcESuxEvciip3-sy2h4S_4soflvFR54Ey0OExOn-iUS52bZyASPGuvdZtK1-1RJAeG_J5OavbAF8_7EtnHKM8PEc3UdG0afroli6-mZYp5omT-gLSuaWETEB8LD8qhSbLwZMeTyEkuc0FId1MYVattJS1XsIL6YnZWi702huwnVJTqYyLE198KHSlWZnJot6nCPTcfRktsLPwfNoMfh77k9qW9-nic7amqbjXiwe4REy0SZyIfBetrEs6LZ62OLUbYRy_4YzZGdXYb-zW9YrVndlQCnNJgTeRIMm3eoT6c2eAXUzdwViwPd8CgRR8Bwg8Q6gL1FPJ_s-tT34W2tBy6xV9NUSzmHzjGg56BdTUHwxULrarSzU7aAT7YMR7bR5WJ_XD01pXC-iWUI3-rxsaCa1awXRTI5EpRmLsLB2fa-nzECFcYygO6ugni9_NYZGF1fBuLScEBYzGWN4mdiZKbDhP4QBaRE7IC1lreUYMDU4Wf-ZQl0I4gHuP4tt3PSxWTblXZLVA77h2hx4LHChEZ_1Yn8bb_ZKtckbjGw2WZeuMya0BpI43FlQlN5MGhl8QQknLcx4cMxPF0jCK2i75WRzL6HYRgIfpWTMACfAOoDMK3cdQWsJC3znyyYpvUh8mkojDQQd31H5AIr35bqe11GGaKrLM-PK2SfHYxHBk08ksAJvQ2BeMraeRVWzwMusJqfIP-d6lC1mE8CdmaXQizsBnOS4bRV_9iQ-bKFxNsWRb8trHwc-KEWp19IDdLs0Sfd5AzDUsJ2qQkjszTwiih-nn_PBFVitLEvt2ltfrCxKK6J9F_oa9VrbO_DhqR9VLKM7MZ0GFINNDkcmmn93L07FM2ensRC5eT088htnJQ8cMSWnGHRknT-RWsJAUEOMvj_nf19m_uBDXktH2xYattZfhc6sqK3eiKaRoYsCGyzgwsSqQF8PpqHHC39kFD8Zygl0-bVc8EmdU89rQofO1NXEQt7aXMMaioIE-6059ug6AFPrdaOGv6_dd3p0NQiLoF493RKI9nOyI5lz-TfZ8LNsQvhmZC_P40UjBnluamznK9ATQ7jAsVDd3SLI5AonJnGcDgSe40vyEhr78RKrlHg-uETw6wpf67JPhJDgSOyucB__GiVur-bjthDE07PWmetBn8WTL8XWiB5NBZqUKNvL7tmpCbeZ4hPPXLVNx26TYCgWye9OKEq_6qp9pLfP6Jx8VfRHVPUA5grp4suAufZ0iMDoY2ksT6mttrRTwPYN9tbn4jxbuG6QOBLJCER4oobvjodYQj1ZQXlw4qpVKUXcq7yfth239NiE6yktNMa07b1XmlSI2IwsY4cOUYGFWc8ijWAdHlA9oRNPGukIZwJI63MMWq2cv2-sss7IQA7S7frLGg1MQV6uPpInsNlHS7AgfLy8rzAwOG79J61tQaq0_X9iLEbWZg2Nr7GKDMXt15XtQ-FTT8e5aum3AzgNfyNgMb-ARdcQVmzKchHTuga3lw4OSRRBztVbL2eH_T9x4pROYowxFlaQri5j8gzwFQ7kHhPfNB6b_o1lgqgLgg8tVGQtNMp_xfVNNfOlDjlGfTlFNFjwaDpwnsqx8d9IVn6NekpLQJPCJksS11a6oxJarKPJr9ktUPbD34cDEe8e5jp2LEsm_UPFHVujM6o3RNBEoVquQYLG2EMEE45IKiS0_kIqRtfvIxb8r2ZjoQMwTCExdZXqaJmdvY_bApts_VGsha93yJSxYQj7i3D05woCXtxmIBZ5GJShpctWkFmdzvlhfxHlmYJ7ha-Brvf8NNtZjVFAvFXs4JQqHjKr1Ujc0gEjuyZtAcwr7yzC74lDpWsqlRvKg&startDownload=true&detailStyle=5&overlayPosition=1&sign=gpef2p3PRPXNtNnwoIfgNAdncHkr5zlNBeLJdcDVhbnT89fFuOzc5S8YTyWj79IdwostBmykMKSi%0D%0AWPQCsdEs9M4qrfNkI1bwq0aZ4yShjeBJBRZglU28%2FMglSVvywFI6XZpUEWGHE7SkOXQhjPYSFwa1%0D%0AJfmObmhD9vzYP1HlXKo%3D%0D%0A&nonce=-4343571800591712272:29495958&ref=DELIVERY_CALENDAR_1.8.c.1&useCache=true&appSignature=Su8UIKkQjmYbpCtM0k3nDDdk7AneN_pf3GA-kKMIj7w&sdkVersion=1&ext_useCache=true&id=com.aliyun.tongyi&senderPackageName=com.android.calendar&packageName=com.aliyun.tongyi&show_cta=true&appClientId=2882303761517740913"
+  // window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("getSystemInfo", JSON.stringify({"callbackId": "showSystemInfo"}));
+  // window.showSystemInfo = function(result) {
+  //   var data = JSON.parse(result);
+  //   if (data.code === 0) {
+  //     var systemInfo = data.result;
+  //     var htmlMessage = "<h3>系统信息</h3><table border='1'>";
+  //     for (var key in systemInfo) {
+  //       htmlMessage += "<tr><td><b>" + key + "</b></td><td>" + systemInfo[key] + "</td></tr>";
+  //     }
+  //     htmlMessage += "</table>";
+  //     window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("showDialog", JSON.stringify({
+  //       "message": htmlMessage,
+  //       "positiveButton": {
+  //         "text": "确定",
+  //         "callbackId": "closeDialog"
+  //       }
+  //         }));
+  //   }
+  // };
+  //     window.closeDialog = function() {};
 </script>
