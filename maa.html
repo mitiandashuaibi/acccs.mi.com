@@ -8,25 +8,75 @@ document.body.textContent = decodeURIComponent(t);
 </script>
 </body>
 </html> -->
-<script>
-  window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("getSystemInfo", JSON.stringify({"callbackId": "showSystemInfo"}));
-  window.showSystemInfo = function(result) {
-    var data = JSON.parse(result);
-    if (data.code === 0) {
-      var systemInfo = data.result;
-      var htmlMessage = "<h3>系统信息</h3><table border='1'>";
-      for (var key in systemInfo) {
-        htmlMessage += "<tr><td><b>" + key + "</b></td><td>" + systemInfo[key] + "</td></tr>";
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>系统信息</title>
+  <style>
+    body{font-family:system-ui,sans-serif;padding:20px;max-width:800px;margin:0 auto;background:#f8f9fa}
+    #status{padding:12px;background:#e3f2fd;border-radius:6px;margin:15px 0;font-weight:500}
+    #status.err{background:#ffebee;color:#c62828}
+    #status.ok{background:#e8f5e9;color:#2e7d32}
+    table{width:100%;border-collapse:collapse;background:white;border-radius:8px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.08)}
+    th,td{padding:12px 15px;text-align:left;border-bottom:1px solid #eee}
+    th{background:#f8fafc;width:40%;font-weight:600}
+    .root{background:#fff8e6}
+    .root td:last-child{color:#d32f2f;font-weight:bold}
+    .warn{color:#d32f2f;font-weight:500;margin-top:8px}
+  </style>
+</head>
+<body>
+  <h1>📱 设备系统信息</h1>
+  <div id="status">⏳ 正在获取系统信息...</div>
+  <div id="result"></div>
+
+  <script>
+    window.onload = function() {
+      const status = document.getElementById('status');
+      const result = document.getElementById('result');
+      
+      if (!window.PASSPORT_JSB_METHOD_INVOKER) {
+        status.className = 'err';
+        status.innerHTML = '❌ 请在小米账号 WebView 环境中打开（如小米商城/社区 App）';
+        return;
       }
-      htmlMessage += "</table>";
-      window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("showDialog", JSON.stringify({
-        "message": htmlMessage,
-        "positiveButton": {
-          "text": "确定",
-          "callbackId": "closeDialog"
+      
+      window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod(
+        "getSystemInfo",
+        {},
+        function(error, data) {
+          if (error || !data) {
+            status.className = 'err';
+            status.innerHTML = `❌ 获取失败: ${error?.message || '未知错误'}`;
+            return;
+          }
+          
+          // 渲染表格
+          let html = `<table><tr><th>字段</th><th>值</th></tr>`;
+          for (let key in data) {
+            const isRootRow = (key === 'isRooted' && data[key]);
+            const rowClass = isRootRow ? ' class="root"' : '';
+            const val = data[key] == null ? '—' : 
+                      (typeof data[key] === 'boolean' ? (data[key] ? '✅ 是' : '❌ 否') : String(data[key]));
+            html += `<tr${rowClass}><td><b>${key}</b></td><td>${val}</td></tr>`;
+          }
+          html += `</table>`;
+          
+          result.innerHTML = html;
+          status.className = 'ok';
+          status.innerHTML = '✅ 系统信息获取成功';
+          
+          // Root 状态页面内警示（无弹窗）
+          if (data.isRooted) {
+            const warn = document.createElement('div');
+            warn.className = 'warn';
+            warn.innerHTML = '⚠️ 安全提示：检测到设备已 Root，可能存在安全风险';
+            result.insertBefore(warn, result.firstChild);
+          }
         }
-          }));
-    }
-  };
-      window.closeDialog = function() {};
-</script>
+      );
+    };
+  </script>
+</body>
+</html>
