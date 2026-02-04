@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payload - Get System Info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: sans-serif; padding: 10px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>系统信息 (自动获取)</h1>
+    <div id="result-container"></div>
+    <script>
+        function getSystemInfo() {
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.innerHTML = '正在自动获取...';
+            try {
+                if (!window.PASSPORT_JSB_METHOD_INVOKER) {
+                    throw new Error("JSBridge (PASSPORT_JSB_METHOD_INVOKER) not found.");
+                }
+                console.log("在Payload页面自动调用原生方法: getSystemInfo");
+                const resultString = window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("getSystemInfo", "{}");
+                console.log("原生同步返回: ", resultString);
+                const data = JSON.parse(resultString);
+                if (data.code === 0) {
+                    const systemInfo = data.result;
+                    let htmlMessage = "<table><tr><th>属性</th><th>值</th></tr>";
+                    for (const key in systemInfo) {
+                        htmlMessage += "<tr><td><b>" + key + "</b></td><td>" + systemInfo[key] + "</td></tr>";
+                    }
+                    htmlMessage += "</table>";
+                    resultContainer.innerHTML = htmlMessage;
+                } else {
+                    throw new Error(`原生方法返回错误: code=${data.code}, message=${data.message}`);
+                }
+            } catch (error) {
+                console.error("获取系统信息时发生错误:", error);
+                resultContainer.innerHTML = '<p class="error">获取失败: ' + error.message + '</p>';
+            }
+        }
+        getSystemInfo();
+    </script>
+</body>
+</html>
