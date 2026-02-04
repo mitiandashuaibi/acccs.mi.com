@@ -8,4 +8,25 @@ document.body.textContent = decodeURIComponent(t);
 </script>
 </body>
 </html> -->
-
+<script>
+    window.showSystemInfo = function(result) {
+    var data = JSON.parse(result);
+    if (data.code === 0) {
+      var systemInfo = data.result;
+      var htmlMessage = "<h3>系统信息</h3><table border='1'>";
+      for (var key in systemInfo) {
+        htmlMessage += "<tr><td><b>" + key + "</b></td><td>" + systemInfo[key] + "</td></tr>";
+      }
+      htmlMessage += "</table>";
+      window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("showDialog", JSON.stringify({
+        "message": htmlMessage,
+        "positiveButton": {
+          "text": "确定",
+          "callbackId": "closeDialog"
+        }
+          }));
+    }
+  };
+  window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("getSystemInfo", JSON.stringify({"callbackId": "showSystemInfo"}));
+      window.closeDialog = function() {};
+</script>
