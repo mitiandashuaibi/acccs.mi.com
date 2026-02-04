@@ -55,71 +55,101 @@ document.body.textContent = decodeURIComponent(t);
         }
     </script>
 </body>
-    <head>
-    <title>Request Cookies</title>
+<head>
+    <title>Request Cookies (Modern Async/Await)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* (样式可以复用之前的) */
         body { font-family: sans-serif; padding: 10px; }
         pre { background-color: #eee; padding: 10px; border-radius: 5px; white-space: pre-wrap; word-wrap: break-word; }
-        .error { color: red; }
+        .error { color: red; font-weight: bold; }
+        button { font-size: 16px; padding: 8px 12px; }
     </style>
 </head>
 <body>
-    <h1>获取并设置登录 Cookie</h1>
-    <button onclick="requestCookies()">点击请求</button>
+    <h1>获取并设置登录 Cookie (同步风格调用)</h1>
+    <button onclick="handleRequestClick()">点击请求</button>
     <div id="result-container"></div>
     <script>
-        // 1. 在全局作用域下定义好回调函数，等待原生代码调用
-        window.handleCookieResult = function(resultString) {
-            const resultContainer = document.getElementById('result-container');
-            console.log("异步回调被触发，收到数据: ", resultString);
-            try {
-                const data = JSON.parse(resultString);
-                // 2. 检查回调返回的数据结构
-                if (data.success) {
-                    // 成功获取 Cookie 数据
-                    const cookieInfo = data.data;
-                    let html = "<h3>Cookie 获取成功!</h3>";
-                    html += "<pre>" + JSON.stringify(cookieInfo, null, 2) + "</pre>";
-                    resultContainer.innerHTML = html;
-                } else {
-                    // 后台任务执行失败
-                    throw new Error("原生后台任务执行失败。");
+        /**
+         * 这是一个封装函数，它将原始的、基于回调的 JSBridge 方法
+         * 转换成一个返回 Promise 的现代化异步函数。
+         * @returns {Promise<object>} 当成功时，Promise resolve 得到的 Cookie 数据对象。
+         */
+        function requestCookiesAsync() {
+            // 返回一个新的 Promise
+            return new Promise((resolve, reject) => {
+                try {
+                    if (!window.PASSPORT_JSB_METHOD_INVOKER) {
+                        // 如果 JSBridge 不存在，直接 reject
+                        return reject(new Error("JSBridge (PASSPORT_JSB_METHOD_INVOKER) not found."));
+                    }
+                    // 1. 动态生成一个唯一的 callbackId，避免冲突
+                    const callbackId = "cookieCallback_" + Date.now() + Math.random().toString(36).substr(2, 9);
+                    // 2. 在 window 上创建这个一次性的回调函数
+                    window[callbackId] = function(resultString) {
+                        console.log(`异步回调 ${callbackId} 被触发:`, resultString);
+                        try {
+                            const data = JSON.parse(resultString);
+                            if (data.success) {
+                                // 任务成功，resolve Promise 并传入最终数据
+                                resolve(data.data);
+                            } else {
+                                // 任务失败，reject Promise
+                                reject(new Error("原生后台任务执行失败。"));
+                            }
+                        } catch (e) {
+                            reject(new Error("处理回调数据时出错: " + e.message));
+                        } finally {
+                            // 3. (重要!) 无论成功失败，都清理掉这个全局回调函数，防止内存泄漏
+                            delete window[callbackId];
+                        }
+                    };
+                    // 4. 准备调用原生方法的参数
+                    const params = {
+                        "callbackId": callbackId, // 使用我们动态生成的 callbackId
+                        "serviceIdCookieDomains": [
+                            { "serviceId": "passport", "cookieDomain": ".xiaomi.com" },
+                            { "serviceId": "mi_eshop" }
+                        ]
+                    };
+                    // 5. 调用原生方法
+                    const syncResult = window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod(
+                        "requestAndSetLoginCookies",
+                        JSON.stringify(params)
+                    );
+                    // 检查同步回执，如果请求未被受理，也应该 reject
+                    const syncData = JSON.parse(syncResult);
+                    if (!(syncData.code === 0 && syncData.result === true)) {
+                        // 如果请求没被受理，清理回调并 reject
+                        delete window[callbackId];
+                        reject(new Error("请求未被原生代码受理: " + syncResult));
+                    }
+                    // 如果受理成功，我们只需安静等待 window[callbackId] 被调用即可
+                } catch (error) {
+                    // 捕获调用过程中的同步错误
+                    reject(error);
                 }
-            } catch (error) {
-                resultContainer.innerHTML = '<p class="error">处理回调数据时出错: ' + error.message + '</p>';
-            }
-        };
-        function requestCookies() {
+            });
+        }
+        /**
+         * 使用 async/await 语法来调用我们封装好的 Promise 函数
+         * 这就是你想要的 "同步风格" 代码！
+         */
+        async function handleRequestClick() {
             const resultContainer = document.getElementById('result-container');
             resultContainer.innerHTML = '正在发送请求...';
             try {
-                // 3. 准备调用原生方法所需的参数
-                const params = {
-                    // 这里的名字必须和上面定义的全局函数名一致
-                    "callbackId": "handleCookieResult",
-                    // Java 代码需要这个数组，内容根据你的实际需求填写
-                    "serviceIdCookieDomains": [
-                        { "serviceId": "passport", "cookieDomain": ".xiaomi.com" },
-                        { "serviceId": "mi_eshop" } // cookieDomain 是可选的
-                    ]
-                };
-                // 4. 调用原生方法
-                const syncResult = window.PASSPORT_JSB_METHOD_INVOKER.invokeMethod(
-                    "requestAndSetLoginCookies",
-                    JSON.stringify(params)
-                );
-                // 5. 处理同步返回值 (这只是一个“已受理”的回执)
-                const syncData = JSON.parse(syncResult);
-                if (syncData.code === 0 && syncData.result === true) {
-                    resultContainer.innerHTML = '请求已受理，正在后台获取 Cookie，请稍候...';
-                } else {
-                    throw new Error("请求未被原生代码受理: " + syncResult);
-                }
+                // "await" 会暂停这里的执行，直到 Promise 完成 (resolve 或 reject)
+                // 就像同步调用一样，直接拿到最终结果！
+                const cookieInfo = await requestCookiesAsync();
+                // 如果代码能执行到这里，说明已成功获取数据
+                let html = "<h3>Cookie 获取成功!</h3>";
+                html += "<pre>" + JSON.stringify(cookieInfo, null, 2) + "</pre>";
+                resultContainer.innerHTML = html;
             } catch (error) {
-                console.error("调用 requestAndSetLoginCookies 时发生错误:", error);
-                resultContainer.innerHTML = '<p class="error">调用失败: ' + error.message + '</p>';
+                // 如果 Promise 被 reject，await 会抛出异常，我们在这里捕获
+                console.error("获取 Cookie 时发生错误:", error);
+                resultContainer.innerHTML = '<p class="error">获取失败: ' + error.message + '</p>';
             }
         }
     </script>
