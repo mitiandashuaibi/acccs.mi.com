@@ -22,7 +22,6 @@ document.body.textContent = decodeURIComponent(t);
     </style>
 </head>
 <body>
-    <body onload="getSystemInfo()"></body>
     <script>
         function getSystemInfo() {
             const resultContainer = document.getElementById('result-container');
@@ -51,6 +50,7 @@ document.body.textContent = decodeURIComponent(t);
                 resultContainer.innerHTML = '<p class="error">获取失败: ' + error.message + '</p>';
             }
         }
+        window.onload = getSystemInfo; 
     </script>
 </body>
 
