@@ -1,1 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>列出 _native_interface 能力</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    pre {
+      background: #2d2d2d;
+      color: #f8f8f2;
+      padding: 16px;
+      border-radius: 6px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .not-found {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>_native_interface 能力清单</h1>
+  <div id="output"></div>
 
+  <script>
+    function getAllProperties(obj) {
+      const props = new Set();
+
+      // 遍历原型链上的所有可访问属性（包括不可枚举的）
+      while (obj && obj !== Object.prototype) {
+        const ownProps = Object.getOwnPropertyNames(obj);
+        const symbols = Object.getOwnPropertySymbols(obj);
+        for (const p of ownProps) props.add(p);
+        for (const s of symbols) props.add(s.toString());
+        obj = Object.getPrototypeOf(obj);
+      }
+
+      return Array.from(props).sort();
+    }
+
+    function getType(value) {
+      if (value === null) return 'null';
+      if (typeof value === 'object') {
+        return Array.isArray(value) ? 'array' : 'object';
+      }
+      return typeof value;
+    }
+
+    function formatResult(interfaceObj) {
+      const props = getAllProperties(interfaceObj);
+      const lines = [];
+
+      props.forEach(key => {
+        try {
+          const value = interfaceObj[key];
+          const type = getType(value);
+          let desc = `${key}: ${type}`;
+          if (type === 'function') {
+            // 尝试获取函数参数（仅用于展示，可能不准确）
+            const fnStr = value.toString();
+            const match = fnStr.match(/function\s*\(([^)]*)\)/);
+            const params = match ? match[1] : '...';
+            desc += ` (params: ${params})`;
+          }
+          lines.push(desc);
+        } catch (e) {
+          lines.push(`${key}: [无法访问 - ${e.message}]`);
+        }
+      });
+
+      return lines.join('\n');
+    }
+
+    const outputEl = document.getElementById('output');
+
+    if (typeof window._native_interface !== 'undefined') {
+      const resultText = formatResult(window._native_interface);
+      outputEl.innerHTML = `<pre>${resultText}</pre>`;
+    } else {
+      outputEl.innerHTML = '<p class="not-found">❌ 未找到 _native_interface 对象！</p>';
+    }
+  </script>
+</body>
+</html>
