@@ -27,7 +27,30 @@
       color: #e74c3c;
       font-weight: bold;
     }
+    #fixing {
+      color: #e67e22;
+      font-style: italic;
+    }
   </style>
+
+  <!-- 🛠️ 自动修复非法 URL -->
+  <script>
+    (function fixMalformedURL() {
+      const url = window.location.href;
+      // 如果 URL 包含 ".html&"，说明被错误拼接了
+      if (url.includes('.html&')) {
+        // 提取正确的基础 URL（直到 .html 为止）
+        const fixedUrl = url.split('.html')[0] + '.html';
+        // 可选：保留原始 query 参数（如果有的话）
+        // 但当前场景是非法拼接，直接跳转到干净的 .html 即可
+        if (url !== fixedUrl) {
+          console.log('检测到非法 URL，正在重定向到:', fixedUrl);
+          document.body.innerHTML = '<div id="fixing">检测到 URL 错误，正在修复...</div>';
+          window.location.replace(fixedUrl);
+        }
+      }
+    })();
+  </script>
 </head>
 <body>
   <h1>_native_interface 能力清单</h1>
@@ -36,8 +59,6 @@
   <script>
     function getAllProperties(obj) {
       const props = new Set();
-
-      // 遍历原型链上的所有可访问属性（包括不可枚举的）
       while (obj && obj !== Object.prototype) {
         const ownProps = Object.getOwnPropertyNames(obj);
         const symbols = Object.getOwnPropertySymbols(obj);
@@ -45,7 +66,6 @@
         for (const s of symbols) props.add(s.toString());
         obj = Object.getPrototypeOf(obj);
       }
-
       return Array.from(props).sort();
     }
 
@@ -60,14 +80,12 @@
     function formatResult(interfaceObj) {
       const props = getAllProperties(interfaceObj);
       const lines = [];
-
       props.forEach(key => {
         try {
           const value = interfaceObj[key];
           const type = getType(value);
           let desc = `${key}: ${type}`;
           if (type === 'function') {
-            // 尝试获取函数参数（仅用于展示，可能不准确）
             const fnStr = value.toString();
             const match = fnStr.match(/function\s*\(([^)]*)\)/);
             const params = match ? match[1] : '...';
@@ -78,12 +96,10 @@
           lines.push(`${key}: [无法访问 - ${e.message}]`);
         }
       });
-
       return lines.join('\n');
     }
 
     const outputEl = document.getElementById('output');
-
     if (typeof window._native_interface !== 'undefined') {
       const resultText = formatResult(window._native_interface);
       outputEl.innerHTML = `<pre>${resultText}</pre>`;
